@@ -12,7 +12,7 @@ global_class = JSClass.new
 @@str = FFI::MemoryPointer.new(:char, 6).put_string(0, 'global')
 global_class.to_ptr.put_pointer(0, @@str)
 
-global_class[:flags] = 10 # JSCLASS_IS_GLOBAL
+# global_class[:flags] = JSCLASS_IS_GLOBAL # crash using JSCLASS_IS_GLOBAL
 global_class[:addProperty] = method(:JS_PropertyStub).to_proc
 global_class[:delProperty] = method(:JS_PropertyStub).to_proc
 global_class[:getProperty] = method(:JS_PropertyStub).to_proc
@@ -25,7 +25,8 @@ global_class[:finalize] = method(:JS_FinalizeStub).to_proc
 def report_error(context, message, report)
   report_struct = JSErrorReport.new(report)
   printf("%s:%u:%s\n",
-         report_struct[:filename] ? report_struct[:filename] : "<no filename>", report_struct[:lineno],
+         report_struct[:filename] ? report_struct[:filename] : "<no filename>", 
+         report_struct[:lineno],
          message)
 end
 
