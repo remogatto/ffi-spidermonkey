@@ -7,7 +7,7 @@ global_class = JSClass.new
 
 # Global class initialization
 
-global_class[:name] = FFI::MemoryPointer.from_string('global')
+global_class.set_name('global')
 # global_class[:flags] = JSCLASS_IS_GLOBAL # crash using JSCLASS_IS_GLOBAL
 global_class[:addProperty] = method(:JS_PropertyStub).to_proc
 global_class[:delProperty] = method(:JS_PropertyStub).to_proc

@@ -256,6 +256,11 @@ module JsAPI
            :mark, :JSMarkOp,
            :reserveSlots, :JSReserveSlotsOp
     )
+    # Setter method for name string field.
+    def set_name(string)
+      @name = FFI::MemoryPointer.from_string(string)
+      self[:name] = @name
+    end
   end
   #FIXME: callback should be inlined within structs
   callback(:reserved0, [  ], :void)
