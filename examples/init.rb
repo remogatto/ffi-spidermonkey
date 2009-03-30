@@ -7,11 +7,7 @@ global_class = JSClass.new
 
 # Global class initialization
 
-# This in an unacceptable workaround for writing into a struct field
-# of type :string
-@@str = FFI::MemoryPointer.new(:char, 6).put_string(0, 'global')
-global_class.to_ptr.put_pointer(0, @@str)
-
+global_class[:name] = FFI::MemoryPointer.from_string('global')
 # global_class[:flags] = JSCLASS_IS_GLOBAL # crash using JSCLASS_IS_GLOBAL
 global_class[:addProperty] = method(:JS_PropertyStub).to_proc
 global_class[:delProperty] = method(:JS_PropertyStub).to_proc

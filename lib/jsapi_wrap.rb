@@ -237,7 +237,7 @@ module JsAPI
   attach_function :JS_SetThreadStackLimit, [ :pointer, :ulong ], :void
   class JSClass < FFI::Struct
     layout(
-           :name, :string,
+           :name, :pointer, # :name declared as :pointer instead of :string
            :flags, :uint,
            :addProperty, :JSPropertyOp,
            :delProperty, :JSPropertyOp,
