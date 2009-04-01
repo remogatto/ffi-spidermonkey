@@ -26,8 +26,7 @@ def report_error(context, message, report)
          message)
 end
 
-# Must be JS_NewRuntime
-rt = JS_Init(8 * 1024 * 1024)
+rt = JS_NewRuntime(8 * 1024 * 1024)
 
 cx = JS_NewContext(rt, 8192)
 JS_SetOptions(cx, JSOPTION_VAROBJFIX)
@@ -47,7 +46,6 @@ p val.get_double(0)
 
 JS_DestroyContext(cx)
 
-# must be JS_DestroyRuntime
-JS_Finish(rt)
+JS_DestroyRuntime(rt)
 JS_ShutDown()
 
