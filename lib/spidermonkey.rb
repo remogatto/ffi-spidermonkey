@@ -1,6 +1,7 @@
+
 require 'rubygems'
 require 'ffi'
-module JsAPI
+module SpiderMonkey
   extend FFI::Library
   ffi_lib 'mozjs'
   JS_BYTES_PER_BYTE = 1
@@ -103,10 +104,18 @@ module JsAPI
 
   class JSErrorFormatString < FFI::Struct
     layout(
-           :format, :string,
+           :format, :pointer,
            :argCount, :ushort,
            :exnType, :short
     )
+    def format=(str)
+      @format = FFI::MemoryPointer.from_string(str)
+      self[:format] = @format
+    end
+    def format
+      @format.get_string(0)
+    end
+
   end
   callback(:JSErrorCallback, [ :pointer, :string, :uint ], :pointer)
   callback(:JSLocaleToUpperCase, [ :pointer, :pointer, :pointer ], :int)
@@ -237,7 +246,7 @@ module JsAPI
   attach_function :JS_SetThreadStackLimit, [ :pointer, :ulong ], :void
   class JSClass < FFI::Struct
     layout(
-           :name, :pointer, # :name declared as :pointer instead of :string
+           :name, :pointer,
            :flags, :uint,
            :addProperty, :JSPropertyOp,
            :delProperty, :JSPropertyOp,
@@ -256,30 +265,196 @@ module JsAPI
            :mark, :JSMarkOp,
            :reserveSlots, :JSReserveSlotsOp
     )
-    # Setter method for name string field.
-    def set_name(string)
-      @name = FFI::MemoryPointer.from_string(string)
+    def name=(str)
+      @name = FFI::MemoryPointer.from_string(str)
       self[:name] = @name
     end
+    def name
+      @name.get_string(0)
+    end
+    def addProperty=(cb)
+      @addProperty = cb
+      self[:addProperty] = @addProperty
+    end
+    def addProperty
+      @addProperty
+    end
+    def delProperty=(cb)
+      @delProperty = cb
+      self[:delProperty] = @delProperty
+    end
+    def delProperty
+      @delProperty
+    end
+    def getProperty=(cb)
+      @getProperty = cb
+      self[:getProperty] = @getProperty
+    end
+    def getProperty
+      @getProperty
+    end
+    def setProperty=(cb)
+      @setProperty = cb
+      self[:setProperty] = @setProperty
+    end
+    def setProperty
+      @setProperty
+    end
+    def enumerate=(cb)
+      @enumerate = cb
+      self[:enumerate] = @enumerate
+    end
+    def enumerate
+      @enumerate
+    end
+    def resolve=(cb)
+      @resolve = cb
+      self[:resolve] = @resolve
+    end
+    def resolve
+      @resolve
+    end
+    def convert=(cb)
+      @convert = cb
+      self[:convert] = @convert
+    end
+    def convert
+      @convert
+    end
+    def finalize=(cb)
+      @finalize = cb
+      self[:finalize] = @finalize
+    end
+    def finalize
+      @finalize
+    end
+    def getObjectOps=(cb)
+      @getObjectOps = cb
+      self[:getObjectOps] = @getObjectOps
+    end
+    def getObjectOps
+      @getObjectOps
+    end
+    def checkAccess=(cb)
+      @checkAccess = cb
+      self[:checkAccess] = @checkAccess
+    end
+    def checkAccess
+      @checkAccess
+    end
+    def call=(cb)
+      @call = cb
+      self[:call] = @call
+    end
+    def call
+      @call
+    end
+    def construct=(cb)
+      @construct = cb
+      self[:construct] = @construct
+    end
+    def construct
+      @construct
+    end
+    def xdrObject=(cb)
+      @xdrObject = cb
+      self[:xdrObject] = @xdrObject
+    end
+    def xdrObject
+      @xdrObject
+    end
+    def hasInstance=(cb)
+      @hasInstance = cb
+      self[:hasInstance] = @hasInstance
+    end
+    def hasInstance
+      @hasInstance
+    end
+    def mark=(cb)
+      @mark = cb
+      self[:mark] = @mark
+    end
+    def mark
+      @mark
+    end
+    def reserveSlots=(cb)
+      @reserveSlots = cb
+      self[:reserveSlots] = @reserveSlots
+    end
+    def reserveSlots
+      @reserveSlots
+    end
+
   end
-  #FIXME: callback should be inlined within structs
-  callback(:reserved0, [  ], :void)
-  callback(:reserved1, [  ], :void)
-  callback(:reserved2, [  ], :void)
-  callback(:reserved3, [  ], :void)
-  callback(:reserved4, [  ], :void)
   class JSExtendedClass < FFI::Struct
     layout(
            :base, JSClass,
            :equality, :JSEqualityOp,
            :outerObject, :JSObjectOp,
            :innerObject, :JSObjectOp,
-           :reserved0, :reserved0,
-           :reserved1, :reserved1,
-           :reserved2, :reserved2,
-           :reserved3, :reserved3,
-           :reserved4, :reserved4
+           :reserved0, callback([  ], :void),
+           :reserved1, callback([  ], :void),
+           :reserved2, callback([  ], :void),
+           :reserved3, callback([  ], :void),
+           :reserved4, callback([  ], :void)
     )
+    def equality=(cb)
+      @equality = cb
+      self[:equality] = @equality
+    end
+    def equality
+      @equality
+    end
+    def outerObject=(cb)
+      @outerObject = cb
+      self[:outerObject] = @outerObject
+    end
+    def outerObject
+      @outerObject
+    end
+    def innerObject=(cb)
+      @innerObject = cb
+      self[:innerObject] = @innerObject
+    end
+    def innerObject
+      @innerObject
+    end
+    def reserved0=(cb)
+      @reserved0 = cb
+      self[:reserved0] = @reserved0
+    end
+    def reserved0
+      @reserved0
+    end
+    def reserved1=(cb)
+      @reserved1 = cb
+      self[:reserved1] = @reserved1
+    end
+    def reserved1
+      @reserved1
+    end
+    def reserved2=(cb)
+      @reserved2 = cb
+      self[:reserved2] = @reserved2
+    end
+    def reserved2
+      @reserved2
+    end
+    def reserved3=(cb)
+      @reserved3 = cb
+      self[:reserved3] = @reserved3
+    end
+    def reserved3
+      @reserved3
+    end
+    def reserved4=(cb)
+      @reserved4 = cb
+      self[:reserved4] = @reserved4
+    end
+    def reserved4
+      @reserved4
+    end
+
   end
   JSCLASS_HAS_PRIVATE = (1 << 0)
   JSCLASS_NEW_ENUMERATE = (1 << 1)
@@ -324,6 +499,175 @@ module JsAPI
            :getRequiredSlot, :JSGetRequiredSlotOp,
            :setRequiredSlot, :JSSetRequiredSlotOp
     )
+    def newObjectMap=(cb)
+      @newObjectMap = cb
+      self[:newObjectMap] = @newObjectMap
+    end
+    def newObjectMap
+      @newObjectMap
+    end
+    def destroyObjectMap=(cb)
+      @destroyObjectMap = cb
+      self[:destroyObjectMap] = @destroyObjectMap
+    end
+    def destroyObjectMap
+      @destroyObjectMap
+    end
+    def lookupProperty=(cb)
+      @lookupProperty = cb
+      self[:lookupProperty] = @lookupProperty
+    end
+    def lookupProperty
+      @lookupProperty
+    end
+    def defineProperty=(cb)
+      @defineProperty = cb
+      self[:defineProperty] = @defineProperty
+    end
+    def defineProperty
+      @defineProperty
+    end
+    def getProperty=(cb)
+      @getProperty = cb
+      self[:getProperty] = @getProperty
+    end
+    def getProperty
+      @getProperty
+    end
+    def setProperty=(cb)
+      @setProperty = cb
+      self[:setProperty] = @setProperty
+    end
+    def setProperty
+      @setProperty
+    end
+    def getAttributes=(cb)
+      @getAttributes = cb
+      self[:getAttributes] = @getAttributes
+    end
+    def getAttributes
+      @getAttributes
+    end
+    def setAttributes=(cb)
+      @setAttributes = cb
+      self[:setAttributes] = @setAttributes
+    end
+    def setAttributes
+      @setAttributes
+    end
+    def deleteProperty=(cb)
+      @deleteProperty = cb
+      self[:deleteProperty] = @deleteProperty
+    end
+    def deleteProperty
+      @deleteProperty
+    end
+    def defaultValue=(cb)
+      @defaultValue = cb
+      self[:defaultValue] = @defaultValue
+    end
+    def defaultValue
+      @defaultValue
+    end
+    def enumerate=(cb)
+      @enumerate = cb
+      self[:enumerate] = @enumerate
+    end
+    def enumerate
+      @enumerate
+    end
+    def checkAccess=(cb)
+      @checkAccess = cb
+      self[:checkAccess] = @checkAccess
+    end
+    def checkAccess
+      @checkAccess
+    end
+    def thisObject=(cb)
+      @thisObject = cb
+      self[:thisObject] = @thisObject
+    end
+    def thisObject
+      @thisObject
+    end
+    def dropProperty=(cb)
+      @dropProperty = cb
+      self[:dropProperty] = @dropProperty
+    end
+    def dropProperty
+      @dropProperty
+    end
+    def call=(cb)
+      @call = cb
+      self[:call] = @call
+    end
+    def call
+      @call
+    end
+    def construct=(cb)
+      @construct = cb
+      self[:construct] = @construct
+    end
+    def construct
+      @construct
+    end
+    def xdrObject=(cb)
+      @xdrObject = cb
+      self[:xdrObject] = @xdrObject
+    end
+    def xdrObject
+      @xdrObject
+    end
+    def hasInstance=(cb)
+      @hasInstance = cb
+      self[:hasInstance] = @hasInstance
+    end
+    def hasInstance
+      @hasInstance
+    end
+    def setProto=(cb)
+      @setProto = cb
+      self[:setProto] = @setProto
+    end
+    def setProto
+      @setProto
+    end
+    def setParent=(cb)
+      @setParent = cb
+      self[:setParent] = @setParent
+    end
+    def setParent
+      @setParent
+    end
+    def mark=(cb)
+      @mark = cb
+      self[:mark] = @mark
+    end
+    def mark
+      @mark
+    end
+    def clear=(cb)
+      @clear = cb
+      self[:clear] = @clear
+    end
+    def clear
+      @clear
+    end
+    def getRequiredSlot=(cb)
+      @getRequiredSlot = cb
+      self[:getRequiredSlot] = @getRequiredSlot
+    end
+    def getRequiredSlot
+      @getRequiredSlot
+    end
+    def setRequiredSlot=(cb)
+      @setRequiredSlot = cb
+      self[:setRequiredSlot] = @setRequiredSlot
+    end
+    def setRequiredSlot
+      @setRequiredSlot
+    end
+
   end
   class JSXMLObjectOps < FFI::Struct
     layout(
@@ -334,6 +678,42 @@ module JsAPI
            :equality, :JSEqualityOp,
            :concatenate, :JSConcatenateOp
     )
+    def getMethod=(cb)
+      @getMethod = cb
+      self[:getMethod] = @getMethod
+    end
+    def getMethod
+      @getMethod
+    end
+    def setMethod=(cb)
+      @setMethod = cb
+      self[:setMethod] = @setMethod
+    end
+    def setMethod
+      @setMethod
+    end
+    def enumerateValues=(cb)
+      @enumerateValues = cb
+      self[:enumerateValues] = @enumerateValues
+    end
+    def enumerateValues
+      @enumerateValues
+    end
+    def equality=(cb)
+      @equality = cb
+      self[:equality] = @equality
+    end
+    def equality
+      @equality
+    end
+    def concatenate=(cb)
+      @concatenate = cb
+      self[:concatenate] = @concatenate
+    end
+    def concatenate
+      @concatenate
+    end
+
   end
   class JSProperty < FFI::Struct
     layout(
@@ -362,28 +742,73 @@ module JsAPI
   class JSConstDoubleSpec < FFI::Struct
     layout(
            :dval, :double,
-           :name, :string,
+           :name, :pointer,
            :flags, :uchar,
            :spare, [:uchar, 3]
     )
+    def name=(str)
+      @name = FFI::MemoryPointer.from_string(str)
+      self[:name] = @name
+    end
+    def name
+      @name.get_string(0)
+    end
+
   end
   class JSPropertySpec < FFI::Struct
     layout(
-           :name, :string,
+           :name, :pointer,
            :tinyid, :char,
            :flags, :uchar,
            :getter, :JSPropertyOp,
            :setter, :JSPropertyOp
     )
+    def name=(str)
+      @name = FFI::MemoryPointer.from_string(str)
+      self[:name] = @name
+    end
+    def name
+      @name.get_string(0)
+    end
+    def getter=(cb)
+      @getter = cb
+      self[:getter] = @getter
+    end
+    def getter
+      @getter
+    end
+    def setter=(cb)
+      @setter = cb
+      self[:setter] = @setter
+    end
+    def setter
+      @setter
+    end
+
   end
   class JSFunctionSpec < FFI::Struct
     layout(
-           :name, :string,
+           :name, :pointer,
            :call, :JSNative,
            :nargs, :ushort,
            :flags, :ushort,
            :extra, :uint
     )
+    def name=(str)
+      @name = FFI::MemoryPointer.from_string(str)
+      self[:name] = @name
+    end
+    def name
+      @name.get_string(0)
+    end
+    def call=(cb)
+      @call = cb
+      self[:call] = @call
+    end
+    def call
+      @call
+    end
+
   end
   attach_function :JS_InitClass, [ :pointer, :pointer, :pointer, :pointer, :JSNative, :uint, :pointer, :pointer, :pointer, :pointer ], :pointer
   attach_function :JS_GetClass, [ :pointer ], :pointer
@@ -451,20 +876,51 @@ module JsAPI
   attach_function :JS_SetCheckObjectAccessCallback, [ :pointer, :JSCheckAccessOp ], :JSCheckAccessOp
   attach_function :JS_GetReservedSlot, [ :pointer, :pointer, :uint, :pointer ], :int
   attach_function :JS_SetReservedSlot, [ :pointer, :pointer, :uint, :long ], :int
-  # FIXME: should support inlined callbacks in structs
-  callback(:getPrincipalArray, [ :pointer, :pointer ], :pointer)
-  callback(:globalPrivilegesEnabled, [ :pointer, :pointer ], :int)
-  callback(:destroy, [ :pointer, :pointer ], :void)
-  callback(:subsume, [ :pointer, :pointer ], :int)
   class JSPrincipals < FFI::Struct
     layout(
-           :codebase, :string,
-           :getPrincipalArray, :getPrincipalArray,
-           :globalPrivilegesEnabled, :globalPrivilegesEnabled,
+           :codebase, :pointer,
+           :getPrincipalArray, callback([ :pointer, :pointer ], :pointer),
+           :globalPrivilegesEnabled, callback([ :pointer, :pointer ], :int),
            :refcount, :int,
-           :destroy, :destroy,
-           :subsume, :subsume
+           :destroy, callback([ :pointer, :pointer ], :void),
+           :subsume, callback([ :pointer, :pointer ], :int)
     )
+    def codebase=(str)
+      @codebase = FFI::MemoryPointer.from_string(str)
+      self[:codebase] = @codebase
+    end
+    def codebase
+      @codebase.get_string(0)
+    end
+    def getPrincipalArray=(cb)
+      @getPrincipalArray = cb
+      self[:getPrincipalArray] = @getPrincipalArray
+    end
+    def getPrincipalArray
+      @getPrincipalArray
+    end
+    def globalPrivilegesEnabled=(cb)
+      @globalPrivilegesEnabled = cb
+      self[:globalPrivilegesEnabled] = @globalPrivilegesEnabled
+    end
+    def globalPrivilegesEnabled
+      @globalPrivilegesEnabled
+    end
+    def destroy=(cb)
+      @destroy = cb
+      self[:destroy] = @destroy
+    end
+    def destroy
+      @destroy
+    end
+    def subsume=(cb)
+      @subsume = cb
+      self[:subsume] = @subsume
+    end
+    def subsume
+      @subsume
+    end
+
   end
   attach_function :JS_SetPrincipalsTranscoder, [ :pointer, :JSPrincipalsTranscoder ], :JSPrincipalsTranscoder
   attach_function :JS_SetObjectPrincipalsFinder, [ :pointer, :JSObjectPrincipalsFinder ], :JSObjectPrincipalsFinder
@@ -545,6 +1001,42 @@ module JsAPI
            :localeToUnicode, :JSLocaleToUnicode,
            :localeGetErrorMessage, :JSErrorCallback
     )
+    def localeToUpperCase=(cb)
+      @localeToUpperCase = cb
+      self[:localeToUpperCase] = @localeToUpperCase
+    end
+    def localeToUpperCase
+      @localeToUpperCase
+    end
+    def localeToLowerCase=(cb)
+      @localeToLowerCase = cb
+      self[:localeToLowerCase] = @localeToLowerCase
+    end
+    def localeToLowerCase
+      @localeToLowerCase
+    end
+    def localeCompare=(cb)
+      @localeCompare = cb
+      self[:localeCompare] = @localeCompare
+    end
+    def localeCompare
+      @localeCompare
+    end
+    def localeToUnicode=(cb)
+      @localeToUnicode = cb
+      self[:localeToUnicode] = @localeToUnicode
+    end
+    def localeToUnicode
+      @localeToUnicode
+    end
+    def localeGetErrorMessage=(cb)
+      @localeGetErrorMessage = cb
+      self[:localeGetErrorMessage] = @localeGetErrorMessage
+    end
+    def localeGetErrorMessage
+      @localeGetErrorMessage
+    end
+
   end
   attach_function :JS_SetLocaleCallbacks, [ :pointer, :pointer ], :void
   attach_function :JS_GetLocaleCallbacks, [ :pointer ], :pointer
@@ -557,10 +1049,10 @@ module JsAPI
   attach_function :JS_ReportOutOfMemory, [ :pointer ], :void
   class JSErrorReport < FFI::Struct
     layout(
-           :filename, :string,
+           :filename, :pointer,
            :lineno, :uint,
-           :linebuf, :string,
-           :tokenptr, :string,
+           :linebuf, :pointer,
+           :tokenptr, :pointer,
            :uclinebuf, :pointer,
            :uctokenptr, :pointer,
            :flags, :uint,
@@ -568,6 +1060,28 @@ module JsAPI
            :ucmessage, :pointer,
            :messageArgs, :pointer
     )
+    def filename=(str)
+      @filename = FFI::MemoryPointer.from_string(str)
+      self[:filename] = @filename
+    end
+    def filename
+      @filename.get_string(0)
+    end
+    def linebuf=(str)
+      @linebuf = FFI::MemoryPointer.from_string(str)
+      self[:linebuf] = @linebuf
+    end
+    def linebuf
+      @linebuf.get_string(0)
+    end
+    def tokenptr=(str)
+      @tokenptr = FFI::MemoryPointer.from_string(str)
+      self[:tokenptr] = @tokenptr
+    end
+    def tokenptr
+      @tokenptr.get_string(0)
+    end
+
   end
   JSREPORT_ERROR = 0x0
   JSREPORT_WARNING = 0x1
@@ -592,18 +1106,5 @@ module JsAPI
   attach_function :JS_DropExceptionState, [ :pointer, :pointer ], :void
   attach_function :JS_ErrorFromException, [ :pointer, :long ], :pointer
   attach_function :JS_ThrowReportedError, [ :pointer, :string, :pointer ], :int
-
-  # FIXME: this should be in a helper module
-  def self.JS_BIT(n)       
-    1 << n
-  end
-
-  JSOPTION_VAROBJFIX = JS_BIT(2)
-
-  # FIXME: should be in a helper module
-  alias :JS_NewRuntime :JS_Init
-  alias :JS_DestroyRuntime :JS_Finish
-  alias :JS_LockRuntime :JS_Lock
-  alias :JS_UnlockRuntime :JS_Unlock
 
 end

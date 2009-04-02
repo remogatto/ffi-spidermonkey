@@ -1,9 +1,9 @@
-%module jsapi
+%module spidermonkey
 
 %{
 require 'rubygems'
 require 'ffi'
-module JsAPI
+module SpiderMonkey
   extend FFI::Library
   ffi_lib 'mozjs'
 %}
