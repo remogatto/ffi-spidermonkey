@@ -6,3 +6,12 @@ begin
 rescue LoadError
   nil
 end
+
+desc "Display FIXME"
+task :fixme do
+  Dir.glob('**/*.rb').each do |fn|
+    File.read(fn).scan(/FIXME:(.*?)$/m).each do |fixme|
+      puts "FIXME: #{fixme} ...- '#{fn}'"
+    end
+  end
+end

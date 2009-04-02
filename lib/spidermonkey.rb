@@ -124,6 +124,7 @@ module SpiderMonkey
   callback(:JSLocaleToUnicode, [ :pointer, :string, :pointer ], :int)
   callback(:JSPrincipalsTranscoder, [ :pointer, :pointer ], :int)
   callback(:JSObjectPrincipalsFinder, [ :pointer, :pointer ], :pointer)
+
   JSVAL_OBJECT = 0x0
   JSVAL_INT = 0x1
   JSVAL_DOUBLE = 0x2
