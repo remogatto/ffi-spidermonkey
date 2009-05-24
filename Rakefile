@@ -1,17 +1,12 @@
 require 'rubygems'
+require 'hoe'
+require "rake/extensiontask"
 
-begin
-  require 'ffi-swig-generator'
-  FFI::Generator::Task.new :input_fn => 'interfaces/*.i', :output_dir => 'generated/'
-rescue LoadError
-  nil
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), "lib")))
+
+require 'ffi-spidermonkey'
+
+HOE = Hoe.new('ffi-spidermonkey', FfiSpidermonkey::VERSION) do |p|
+  p.developer('Andrea Fazzi', 'andrea.fazzi@alcacoop.it')
 end
 
-desc "Display FIXME"
-task :fixme do
-  Dir.glob('**/*.rb').each do |fn|
-    File.read(fn).scan(/FIXME:(.*?)$/m).each do |fixme|
-      puts "FIXME: #{fixme} ...- '#{fn}'"
-    end
-  end
-end

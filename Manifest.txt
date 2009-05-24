@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/ffi_spidermonkey
+lib/ffi_spidermonkey.rb
+test/test_ffi_spidermonkey.rb
