@@ -1,4 +1,5 @@
 module SpiderMonkey
+
   module ToJS
 
     def to_js(context)
@@ -7,7 +8,7 @@ module SpiderMonkey
         
       when Class, Hash, Module, File, Struct, Object, Array
         if self.kind_of?(SpiderMonkey::RubyLandProxy)
-          JSValue.new(context, self.js_value)
+          self.js_value
         else
           JSValue.new(context, JSLandProxy.make(self))
         end
@@ -20,6 +21,7 @@ module SpiderMonkey
 end
 
 module SpiderMonkey
+
   class JSValue
 
     include HasPointer
@@ -42,8 +44,16 @@ module SpiderMonkey
 
     end
 
-    def root
-      SpiderMonkey.JS_AddNamedRoot(@context, @ptr, "Test root")
+    def root_rt(name = 'RubyLandProxy')
+      SpiderMonkey.JS_AddNamedRootRT(@context.runtime, @ptr, name)
+    end
+
+    def unroot_rt
+      SpiderMonkey.JS_RemoveRootRT(@context.runtime, @ptr)
+    end
+
+    def root(name = "")
+      SpiderMonkey.JS_AddNamedRoot(@context, @ptr, name)
     end
 
     def unroot
@@ -52,7 +62,7 @@ module SpiderMonkey
 
     def to_object
       js_object = FFI::MemoryPointer.new(:pointer)
-      SpiderMonkey.JS_ValueToObject(@context, @js_value, js_object)
+      SpiderMonkey.JS_ValueToObject(@context, @value, js_object)
       js_object.read_pointer
     end
 

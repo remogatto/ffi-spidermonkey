@@ -6,20 +6,17 @@ module SpiderMonkey
     class << self
       protected :new
 
-      def make(context, value)
-        self.new(context, value)
+      def make(context, value, name = '')
+        self.new(context, value, name)
       end
 
     end
 
-    def initialize(runtime, value)
+    def initialize(runtime, value, name)
       @runtime = runtime
       @context = @runtime.context
-      @js_value = value
-
-      js_object = FFI::MemoryPointer.new(:pointer)
-      SpiderMonkey.JS_ValueToObject(@context, @js_value, js_object)
-      @js_object = js_object.read_pointer
+      @js_value = JSValue.new(@context, value)
+      @js_value.root_rt
     end
 
     def [](name)
@@ -41,9 +38,9 @@ module SpiderMonkey
       case name
         
       when Fixnum
-        SpiderMonkey.JS_SetElement(@context, @js_object, name, value.to_js(@context))
+        SpiderMonkey.JS_SetElement(@context, @js_value.to_object, name, value.to_js(@context))
       else
-        SpiderMonkey.JS_SetProperty(@context, @js_object, name, value.to_js(@context))
+        SpiderMonkey.JS_SetProperty(@context, @js_value.to_object, name, value.to_js(@context))
       end
 
       value
