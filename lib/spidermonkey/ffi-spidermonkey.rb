@@ -437,7 +437,7 @@ module SpiderMonkey
       JSVAL_TO_GCTHING(v)
     end
     def OBJECT_TO_JSVAL(obj)
-      obj
+      FFI::MemoryPointer.new(:pointer).write_pointer(obj).read_long
     end
     def BOOLEAN_TO_JSVAL(b)
       JSVAL_SETTAG(b << JSVAL_TAGBITS, JSVAL_BOOLEAN)
@@ -550,7 +550,7 @@ module SpiderMonkey
   JSCLASS_CACHED_PROTO_WIDTH = 8
 
   JSVAL_VOID = INT_TO_JSVAL(0 - JSVAL_INT_POW2(30))
-  JSVAL_NULL = OBJECT_TO_JSVAL(0)
+  JSVAL_NULL = OBJECT_TO_JSVAL(nil)
   JSVAL_ZERO = INT_TO_JSVAL(0)
   JSVAL_ONE = INT_TO_JSVAL(1)
   JSVAL_FALSE = BOOLEAN_TO_JSVAL(JS_FALSE)

@@ -69,6 +69,14 @@ module SpiderMonkey
     def has_global?
       not (@global.nil? or global.null?)
     end
+    
+    def [](key)
+      JSValue.new(context, SpiderMonkey.OBJECT_TO_JSVAL(@global)).to_ruby[key]
+    end
+    
+    def []=(key, value)
+      JSValue.new(context, SpiderMonkey.OBJECT_TO_JSVAL(@global)).to_ruby[key] = value
+    end
 
     def evaluate(script, filename = nil, linenum = nil)
       compile_and_evaluate(script, filename, linenum)
@@ -101,8 +109,10 @@ module SpiderMonkey
     private
 
     def compile_and_evaluate(script, filename, linenum)
+
       filename ||= 'none'
       linenum  ||= 1
+
       rval = FFI::MemoryPointer.new(:long)
       ok = SpiderMonkey.JS_EvaluateScript(context, global, script, script.size, filename, linenum, rval)
 
@@ -119,7 +129,7 @@ module SpiderMonkey
         
       end
 
-      convert_to_ruby(rval.read_long)
+      JSValue.new(context, rval).to_ruby # convert_to_ruby(rval.read_long)
     end
 
   end

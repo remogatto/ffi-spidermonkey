@@ -7,7 +7,9 @@ module SpiderMonkey
     def test_can_be_initialized_with_pointer
       pointer = FFI::MemoryPointer.new(:long).write_long(0x123)
       js_value = JSValue.new(@runtime.context, pointer)
+      js_value.root
       assert_equal(0x123, js_value.value)
+      js_value.unroot
     end
 
     def test_can_be_initialized_with_a_long

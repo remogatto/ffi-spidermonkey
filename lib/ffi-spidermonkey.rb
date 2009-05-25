@@ -8,4 +8,6 @@ require 'spidermonkey/value.rb'
 require 'spidermonkey/global.rb'
 require 'spidermonkey/context.rb'
 require 'spidermonkey/runtime.rb'
+require 'spidermonkey/ruby_land_proxy.rb'
+
 
