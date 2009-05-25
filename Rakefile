@@ -8,5 +8,6 @@ require 'ffi-spidermonkey'
 
 HOE = Hoe.new('ffi-spidermonkey', FfiSpidermonkey::VERSION) do |p|
   p.developer('Andrea Fazzi', 'andrea.fazzi@alcacoop.it')
+  p.test_globs       = %w(test/**/*_test.rb)
 end
 
